@@ -1,0 +1,11 @@
+{% extends "NG/layout.html" %}
+
+{% block title %}Logout{% endblock %}
+
+{% block body %}
+
+    <h2>You have been logged out.</h2>
+
+    <small class="text-muted"><a href="{% url 'login' %}">Log In Again</a></small>
+
+{% endblock %}

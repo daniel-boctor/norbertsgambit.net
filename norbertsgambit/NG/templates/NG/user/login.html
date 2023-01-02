@@ -1,0 +1,36 @@
+{% extends "NG/layout.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block body %}
+
+    <h2 class="text-center">Login</h2>
+
+    {% for error in form.non_field_errors %}
+        <div class="alert alert-danger alert-dismissible sticky-top fade show" role="alert">
+            <strong>Error:</strong> {{ error }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    <div class="row justify-content-center">
+        <div class="col-lg-4">
+            <form action="{% url 'login' %}" method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username:</label>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="Username" required="">
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password:</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Password" required="">
+                </div>
+                <input class="btn btn-primary" type="submit" value="Login">
+            </form>
+            <small class="text-muted">Need to create an account? <a href="{% url 'register' %}">Sign up here</a></small>
+            <br>
+            <small class="text-muted">Forgot your password? <a href="{% url 'password_reset' %}">Reset your password</a></small>
+        </div>
+    </div>
+
+{% endblock %}
