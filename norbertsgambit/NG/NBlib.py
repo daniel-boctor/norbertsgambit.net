@@ -6,7 +6,6 @@ def norbits_gambit_cost_calc(params, DLR_TO, DLR_U_TO, buy_FX, sell_FX, initial=
     data = pd.DataFrame(columns=["USD_TO_CAD", "CAD_TO_USD", "DLR.TO", "DLR-U.TO"], index=["BUY_FX", "SELL_FX"])
     data.loc["BUY_FX"] = [buy_FX, 1/buy_FX, DLR_TO, DLR_U_TO]
     data.loc["SELL_FX"] = [sell_FX, 1/sell_FX, DLR_TO, DLR_U_TO]
-    data = data.astype(np.float64)
 
     FROM = ["CAD", "DLR.TO", "USD_TO_CAD"] if initial_fx in ["CAD", "TO"] else ["USD", "DLR-U.TO", "CAD_TO_USD"]
     TO = ["CAD", "DLR.TO", "USD_TO_CAD"] if initial_fx not in ["CAD", "TO"] else ["USD", "DLR-U.TO", "CAD_TO_USD"]
@@ -51,12 +50,12 @@ def norbits_gambit_cost_calc(params, DLR_TO, DLR_U_TO, buy_FX, sell_FX, initial=
     output_explicit_costs[TO[0]]["Combined Cost"] = round((output_explicit_costs[FROM[0]]["Local Cost"] * data[TO[2]][0]) + output_explicit_costs[TO[0]]["Local Cost"], 2)
 
     #Total
-    output_total.loc["Explicit Costs Incurred"] = round((output_explicit_costs[FROM[0]]["Combined Cost"] / output_transactions["Amount Converted / Received"]["Buy Side"]) * 100, 4).astype(str) + "%"
-    output_total.loc["Implicit Spread Earned / Payed"] = round((((output_transactions["Amount Converted / Received"]["Sell Side"] * data[FROM[2]][-1]) / output_transactions["Amount Converted / Received"]["Buy Side"]) - 1) * 100, 4).astype(str) + "%"
+    output_total.loc["Explicit Costs Incurred"] = str(round((output_explicit_costs[FROM[0]]["Combined Cost"] / output_transactions["Amount Converted / Received"]["Buy Side"]) * 100, 4)) + "%"
+    output_total.loc["Implicit Spread Earned / Payed"] = str(round((((output_transactions["Amount Converted / Received"]["Sell Side"] * data[FROM[2]][-1]) / output_transactions["Amount Converted / Received"]["Buy Side"]) - 1) * 100, 4)) + "%"
     #output_total.loc["TOTAL RETURN"] = round(((((output_transactions["Amount Converted / Received"]["Sell Side"] - output_explicit_costs[TO[0]]["Combined Cost"]) * data[FROM[2]][-1]) / (output_transactions["Amount Converted / Received"]["Buy Side"])) - 1) * 100, 15).astype(str) + "%"
-    output_total.loc["TOTAL RETURN"] = round((((((output_transactions["Amount Converted / Received"]["Sell Side"] - output_explicit_costs[TO[0]]["Local Cost"]) * data[FROM[2]][-1]) - output_explicit_costs[FROM[0]]["Local Cost"]) / (output_transactions["Amount Converted / Received"]["Buy Side"])) - 1) * 100, 4).astype(str) + "%"
+    output_total.loc["TOTAL RETURN"] = str(round((((((output_transactions["Amount Converted / Received"]["Sell Side"] - output_explicit_costs[TO[0]]["Local Cost"]) * data[FROM[2]][-1]) - output_explicit_costs[FROM[0]]["Local Cost"]) / (output_transactions["Amount Converted / Received"]["Buy Side"])) - 1) * 100, 4)) + "%"
     #output_total.loc["TOTAL P&L"] = "$" + round(((output_transactions["Amount Converted / Received"]["Sell Side"] * data[FROM[2]][-1]) - output_transactions["Amount Converted / Received"]["Buy Side"] - output_explicit_costs[FROM[0]]["Combined Cost"]), 2).astype(str)
-    output_total.loc[f"TOTAL P&L ({FROM[0]})"] = "$" + round((((output_transactions["Amount Converted / Received"]["Sell Side"] - output_explicit_costs[TO[0]]["Local Cost"]) * data[FROM[2]][-1]) - output_explicit_costs[FROM[0]]["Local Cost"] - output_transactions["Amount Converted / Received"]["Buy Side"]), 2).astype(str)
+    output_total.loc[f"TOTAL P&L ({FROM[0]})"] = "$" + str(round((((output_transactions["Amount Converted / Received"]["Sell Side"] - output_explicit_costs[TO[0]]["Local Cost"]) * data[FROM[2]][-1]) - output_explicit_costs[FROM[0]]["Local Cost"] - output_transactions["Amount Converted / Received"]["Buy Side"]), 2))
     if "brokers_spread" in params:
         output_total.columns = ["Norbert's Gambit"]
         output_total["Brokers Spread For Comparison"] = ["", "", "-" + str(params["brokers_spread"]) + "%", "-$" + str(round((params["brokers_spread"]/100) * output_transactions["Amount Converted / Received"]["Buy Side"], 2))]

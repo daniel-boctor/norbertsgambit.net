@@ -23,7 +23,7 @@ def norberts_gambit(request, crudop=None, name=None):
         if crudop == "delete":
             if instance.exists():
                 instance[0].delete()
-                return JsonResponse({"MESSAGE": ['secondary', 'Alert', f'{name} has been deleted!']})
+                return JsonResponse({"MESSAGE": ['info', 'Alert', f'{name} has been deleted!']})
             return JsonResponse({"MESSAGE": ['danger', 'Alert', f'{name} was not found!']})
 
     if request.method == "POST":
@@ -46,9 +46,9 @@ def norberts_gambit(request, crudop=None, name=None):
                 else:
                     message = ['warning', 'Alert', 'You must be logged in to save instances to your account.']
 
-            params = {k: float(form.cleaned_data[k]) for k in list(form.cleaned_data)[8:-3] if form.cleaned_data[k] != None}
+            params = {k: form.cleaned_data[k] for k in list(form.cleaned_data)[8:-3] if form.cleaned_data[k] != None}
             output_transactions, output_total, output_explicit_costs, output_ECN, output_commissions, output_tax  = \
-            norbits_gambit_cost_calc(params, float(form.cleaned_data["DLR_TO"]), float(form.cleaned_data["DLR_U_TO"]), form.cleaned_data["buy_FX"], form.cleaned_data["sell_FX"], float(form.cleaned_data["initial"]), form.cleaned_data["initial_fx"], form.cleaned_data["incur_buy_side_ecn"], form.cleaned_data["incur_sell_side_ecn"])
+            norbits_gambit_cost_calc(params, form.cleaned_data["DLR_TO"], form.cleaned_data["DLR_U_TO"], form.cleaned_data["buy_FX"], form.cleaned_data["sell_FX"], form.cleaned_data["initial"], form.cleaned_data["initial_fx"], form.cleaned_data["incur_buy_side_ecn"], form.cleaned_data["incur_sell_side_ecn"])
 
             return JsonResponse({
                 "MESSAGE": message,
@@ -90,13 +90,13 @@ def norberts_gambit_tax(request):
         queryset = Trade.objects.filter(user=request.user).order_by('-date').values()
     output = pd.DataFrame()
     for data in queryset:
-        params = {k: float(data[k]) for k in list(data)[10:-3] if data[k] != None}
-        _, _, _, _, _, output_tax  = norbits_gambit_cost_calc(params, float(data["DLR_TO"]), float(data["DLR_U_TO"]), data["buy_FX"], data["sell_FX"], float(data["initial"]), data["initial_fx"], data["incur_buy_side_ecn"], data["incur_sell_side_ecn"])
+        params = {k: data[k] for k in list(data)[10:-3] if data[k] != None}
+        _, _, _, _, _, output_tax  = norbits_gambit_cost_calc(params, data["DLR_TO"], data["DLR_U_TO"], data["buy_FX"], data["sell_FX"], data["initial"], data["initial_fx"], data["incur_buy_side_ecn"], data["incur_sell_side_ecn"])
         output_tax.index = [data["name"]]
         output_tax.insert(0, "Ticker", data["cad_ticker"])
         output = pd.concat([output, output_tax])
     
-    return JsonResponse({"output_tax": output.to_html(classes=["table table-hover table-fit-center"], border=0,  justify="unset")})
+    return JsonResponse({"output_tax": output.to_html(classes=["table table-hover table-fit-center"], table_id="tax_df", border=0,  justify="unset")})
 
 def register(request):
     if request.method == "POST":

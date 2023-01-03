@@ -22,9 +22,9 @@ function refresh() {
     fetch_spreads(suffix="U", ticker=document.querySelector("#id_usd_ticker").value)
 }
 
-function message_system(type, header, body) {
+function message_system(type, header, body, form_alert="") {
     document.querySelector('#form-container').insertAdjacentHTML('afterbegin', 
-    `<div class="alert alert-${type} alert-dismissible sticky-top fade show" role="alert">
+    `<div class="alert alert-${type}${form_alert} alert-dismissible sticky-top fade show" role="alert">
         <strong>${header}:</strong> ${body}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>`);
@@ -92,6 +92,12 @@ function load_tax(name="", year="") {
     window.history.replaceState('', '', `/?${new URLSearchParams({name: name, year: year,})}`);
     $.get(`/tax?${new URLSearchParams({name: name, year: year})}`, function(response){
         tax_table_container.innerHTML = response[Object.keys(response)[0]];
+        tax_df.childNodes[3].childNodes.forEach(function(elem) {
+            if (elem.tagName === "TR") {
+                if (elem.childNodes[11].innerHTML.substring(1, 2) === "-") {elem.childNodes[11].style.color = "red"}
+                else {elem.childNodes[11].style.color = "green"}
+            }
+        })
     });
 }
 
@@ -160,7 +166,7 @@ $(document).ready(function() {
                 if (Object.keys(response)[0] === "ERROR") {
                     response = response["ERROR"];
                     for (i=0; i<Object.keys(response).length; i++) {
-                        message_system('danger', Object.keys(response)[i], response[Object.keys(response)[i]])
+                        message_system('danger', Object.keys(response)[i], response[Object.keys(response)[i]], form_alert=" form-alert")
                     }
                 } else {
                     document.querySelectorAll(".form-alert").forEach(function (elem) {elem.remove()})
@@ -181,6 +187,9 @@ $(document).ready(function() {
                             }
                         }
                     })
+                    var cap = document.querySelector("#id_5").firstChild.childNodes[3].childNodes[1];
+                    if (cap.childNodes[9].innerHTML.substring(1, 2) === "-") {cap.childNodes[9].style.color = "red"}
+                    else {cap.childNodes[9].style.color = "green"}
                 }
             }
         });
