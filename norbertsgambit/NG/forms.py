@@ -44,7 +44,8 @@ class NGForm(forms.ModelForm):
             'sell_side_comm': forms.TextInput(attrs={'class':'form-control'}),
             'lower_bound': forms.TextInput(attrs={'class':'form-control'}),
             'upper_bound': forms.TextInput(attrs={'class':'form-control'}),
-            'brokers_spread': forms.TextInput(attrs={'class':'form-control'}),
+            'brokers_spread': forms.TextInput(attrs={'class':'form-control', 'placeholder':'%'}),
+            'dealers_rate': forms.TextInput(attrs={'class':'form-control', 'placeholder':'1 USD = '}),
             'cad_ticker': forms.TextInput(attrs={'class':'form-control'}),
             'usd_ticker': forms.TextInput(attrs={'class':'form-control'}),
             'closed': forms.CheckboxInput(attrs={'class':'form-check-input'})

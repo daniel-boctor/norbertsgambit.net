@@ -40,7 +40,7 @@
         </div>
         <div class="offcanvas-body">
             {% if not user.is_authenticated %}
-                Please <a href="{% url 'login' %}" class="link-primary">login</a> or <a href="{% url 'register' %}" class="link-primary">sign up</a> to save trades.
+                Please <a href="{% url 'login' %}" class="link-primary">login</a> or <a href="{% url 'register' %}" class="link-primary">sign up</a> to save trades and view tax information.
             {% else %}
                 <div class="btn-group">
                 <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">Filter</button>
@@ -135,7 +135,7 @@
         <div class="col-lg-4">
             <button type="button" style="margin-top: 5px; margin-bottom: 10px;" class="btn btn-outline-success" id="back-to-body" onclick="back_to_body()">Back</button>
             <h3 style="color: green;" class="text-center" id="tax_table_title"></h3>
-            <div id="tax_table_container"></div>
+            <div id="tax_table_container" class="table-responsive"></div>
         </div>
     </div>
 
@@ -243,10 +243,15 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td colspan="2">
+                                            <td>
                                                 <hr>
                                                 <label for="brokers_spread" class="form-label">Brokers FX spread (%) for cost comparison (optional)</label>
                                                 {{ form.brokers_spread }}
+                                            </td>
+                                            <td>
+                                                <hr>
+                                                <label for="dealers_rate" class="form-label">Dealers FX rate (1 USD = ) for cost comparison (optional)</label>
+                                                {{ form.dealers_rate }}
                                             </td>
                                         </tr>
                                     </table>

@@ -178,12 +178,15 @@ $(document).ready(function() {
                     document.querySelector("#id_1").firstChild.childNodes[3].childNodes.forEach(function(elem) {
                         if (elem.tagName === "TR") {
                             if (elem.childNodes[1].innerHTML != "Explicit Costs Incurred") {
-                                if (elem.childNodes[3].innerHTML.substring(0, 1) === "-" || elem.childNodes[3].innerHTML.substring(1, 2) === "-") {
-                                    elem.childNodes[3].style.color = "red"
-                                } else {
-                                    elem.childNodes[3].style.color = "green"
+                                for (tmp of [3, 5, 7]) {
+                                    if (elem.childNodes.length > tmp) {
+                                        if (elem.childNodes[tmp].innerHTML.substring(0, 1) === "-" || elem.childNodes[tmp].innerHTML.substring(1, 2) === "-") {
+                                            elem.childNodes[tmp].style.color = "red"
+                                        } else {
+                                            elem.childNodes[tmp].style.color = "green"
+                                        }
+                                    }
                                 }
-                                if (elem.childNodes.length > 5) {elem.childNodes[5].style.color = "red"}
                             }
                         }
                     })

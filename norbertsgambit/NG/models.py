@@ -31,6 +31,7 @@ class Trade(models.Model):
     lower_bound = models.DecimalField(decimal_places=4, default=4.95, max_digits=7, validators=[MinValueValidator(Decimal(0.00))])
     upper_bound = models.DecimalField(decimal_places=4, default=9.95, max_digits=7, validators=[MinValueValidator(Decimal(0.00))])
     brokers_spread = models.DecimalField(decimal_places=4, max_digits=6, null=True, blank=True, validators=[MinValueValidator(Decimal(0.00))])
+    dealers_rate = models.DecimalField(decimal_places=4, max_digits=6, null=True, blank=True, validators=[MinValueValidator(Decimal(0.01))])
     cad_ticker = models.CharField(max_length=8, default="DLR.TO")
     usd_ticker = models.CharField(max_length=8, default="DLR-U.TO")
     closed = models.BooleanField()
