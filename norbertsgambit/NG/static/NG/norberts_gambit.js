@@ -110,9 +110,12 @@ function back_to_body(back=false) {
 
 $(document).ready(function() {
     var url = new URL(window.location.href);
-    if (url.searchParams.get("name")) {name=url.searchParams.get("name")} else {name=""}
-    if (url.searchParams.get("year")) {year=url.searchParams.get("year")} else {year=""}
-    if (url.search) {load_tax(name, year)}
+    if (url.searchParams.get("name") || url.searchParams.get("year")) {
+        if (url.searchParams.get("name")) {name=url.searchParams.get("name")} else {name=""}
+        if (url.searchParams.get("year")) {year=url.searchParams.get("year")} else {year=""}
+        load_tax(name, year)
+    }
+    
     refresh()
     valid_years = new Set()
     fetch(`https://www.bankofcanada.ca/valet/observations/FXUSDCAD?recent=1`)
@@ -177,7 +180,7 @@ $(document).ready(function() {
                     //coloring
                     document.querySelector("#id_1").firstChild.childNodes[3].childNodes.forEach(function(elem) {
                         if (elem.tagName === "TR") {
-                            if (elem.childNodes[1].innerHTML != "Explicit Costs Incurred") {
+                            if (elem.childNodes[1].innerHTML != "Effective FX Rate") {
                                 for (tmp of [3, 5, 7]) {
                                     if (elem.childNodes.length > tmp) {
                                         if (elem.childNodes[tmp].innerHTML.substring(0, 1) === "-" || elem.childNodes[tmp].innerHTML.substring(1, 2) === "-") {

@@ -16,7 +16,7 @@
 
       <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
         <div class="container-fluid">
-        	<a class="navbar-brand" href="{% url 'index' %}"><img src="{% static 'NG/logo.png' %}" style="max-height: 25px;" alt="Norbert's Gambit"> Home</a>
+        	<a class="navbar-brand" href="{% url 'index' %}"><img src="{% static 'NG/norberts-gambit.png' %}" style="max-height: 25px;" alt="Norbert's Gambit"> Norbert's Gambit</a>
           	<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             	<span class="navbar-toggler-icon"></span>
 			</button>
@@ -24,7 +24,6 @@
             	<div class="navbar-nav">
             	</div>
 				<div class="navbar-nav ms-auto">
-          {% url 'about' as the_url %}{% if the_url %}<a class="nav-link" href="{% url 'about' %}">About</a>{% endif %}
 					{% if not user.is_authenticated %}
 						<a class="nav-link" href="{% url 'login' %}">Login</a>
 						<a class="nav-link" href="{% url 'register' %}">Register</a>
