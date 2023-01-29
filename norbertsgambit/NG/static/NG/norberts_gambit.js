@@ -31,11 +31,14 @@ function message_system(type, header, body, form_alert="") {
 }
 
 function crud_api_call(year="") {
-    if (!year) {valid_years.clear()}
+    if (year) {offcanvasScrollingLabel.innerHTML = `Saved Trades from ${year}`}
+    else {
+        offcanvasScrollingLabel.innerHTML = `Saved Trades`
+        valid_years.clear()
+    }
     $.get(`/api?${new URLSearchParams({year: year})}`, function(data){
         $("#trades-container").empty();
         $("#trades-container").append('<div id="open"></div>');
-        $("#trades-container").append('<br><hr><br>');
         $("#trades-container").append('<div id="closed"></div>');
         if ($.isEmptyObject(data) === true) {
             $("#trades-container").append('You have no trades saved. Select the dropdown menu next to submit to get started!');
@@ -58,6 +61,7 @@ function crud_api_call(year="") {
                 }
             }
         }
+        if ($("#open")[0].innerHTML && $("#closed")[0].innerHTML) {$("#open")[0].insertAdjacentHTML('afterend', '<br><hr><br>');}
         //valid_years.sort()
         $("#filter-dropdown-menu").empty();
         $("#filter-dropdown-menu").append(`<li><button class="dropdown-item" onclick="crud_api_call()">All</button></li>`)
