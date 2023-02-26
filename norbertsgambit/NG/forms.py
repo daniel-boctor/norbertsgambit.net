@@ -1,5 +1,5 @@
 from django import forms
-from .models import User, Trade
+from .models import User, Trade, Portfolio
 from django.contrib.auth.forms import UserCreationForm
 
 class MyUserCreationForm(UserCreationForm):
@@ -29,6 +29,7 @@ class NGForm(forms.ModelForm):
         exclude = ('user',)
         widgets = {
             'name': forms.TextInput(attrs={'class':'form-control', 'placeholder':'Name'}),
+            'portfolio': forms.Select(attrs={'class':'form-select'}),
             'date': forms.DateInput(attrs={'class':'form-control', 'type':'date'}),
             'DLR_TO': forms.TextInput(attrs={'class':'form-control'}),
             'DLR_U_TO': forms.TextInput(attrs={'class':'form-control'}),
@@ -53,13 +54,50 @@ class NGForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        if not cleaned_data["name"] and self.user.is_authenticated:
-            cleaned_data["name"] = f"Trade {Trade.objects.filter(user=self.user).count() + 1}"
-        if cleaned_data.get("initial") and cleaned_data["initial_fx"] in ["TO", "U"] and int(cleaned_data["initial"]) != cleaned_data["initial"]:
+
+        #Quantity of shares must be a whole number
+        if cleaned_data.get("initial") and cleaned_data.get("initial_fx") in ["TO", "U"] and int(cleaned_data.get("initial")) != cleaned_data.get("initial"):
             self.add_error('initial', "Quantity of shares must be a whole number.")
+
+        if self.user.is_authenticated:
+            self.instance.user = self.user
+            #Setting default name
+            if not cleaned_data.get("name"):
+                cleaned_data["name"] = f"Trade {Trade.objects.filter(user=self.user).count() + 1}"
+                
         return cleaned_data
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super(NGForm, self).__init__(*args, **kwargs)
+        self.user = user
+        self.fields["portfolio"].queryset = Portfolio.objects.filter(user=self.user) if self.user.is_authenticated else Portfolio.objects.none()
+        if len(self.fields["portfolio"].choices) == 1:
+            self.fields["portfolio"].widget.attrs.update({"disabled": True})
+            #self.fields["portfolio"].empty_label = "No Portfolio"
+
+class PortfolioForm(forms.ModelForm):
+    class Meta:
+        model = Portfolio
+        exclude = ('user',)
+        widgets = {
+            'name': forms.TextInput(attrs={'class':'form-control', 'placeholder':'Portfolio Name'}),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        self.instance.user = self.user
+
+        #Duplicate name detection
+        queryset = Portfolio.objects.filter(user=self.user, name=cleaned_data.get("name"))
+        if self.instance.pk:
+            queryset = queryset.exclude(pk=self.instance.pk)
+        if queryset.exists():
+            self.add_error('name', f'Portfolio named {cleaned_data.get("name")} already exists.')   
+
+        return cleaned_data
+    
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(PortfolioForm, self).__init__(*args, **kwargs)
         self.user = user

@@ -13,6 +13,7 @@ urlpatterns = [
     path("password-complete", auth_views.PasswordResetCompleteView.as_view(template_name="NG/user/password_reset_complete.html"), name="password_reset_complete"),
     path("register", views.register, name="register"),
     path("user/<str:username>", views.user, name="user"),
+    path("user/<str:username>/portfolio", views.user, {'portfolio': True}, name="portfolio"),
 
     path("", views.norberts_gambit, name="index"),
     path("scrape_spreads/<str:ticker>", views.scrape_spreads, name="scrape_spreads"),

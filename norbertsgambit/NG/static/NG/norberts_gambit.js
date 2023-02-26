@@ -2,11 +2,7 @@ function fetch_spreads(suffix="TO", ticker="DLR") {
     fetch(`/scrape_spreads/${ticker}`)
     .then(response => {
         if (response.ok) return response.json()
-        document.querySelector('#form-container').insertAdjacentHTML('afterbegin', 
-        `<div class="alert alert-danger alert-dismissible sticky-top fade show" role="alert">
-            <strong>Error:</strong> ${ticker} could not be found.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>`);
+        message_system("danger", "Error:", `${ticker} could not be found.`)
         throw new Error('Network response was not ok.')
     })
     .then(data => {
@@ -30,47 +26,45 @@ function message_system(type, header, body, form_alert="") {
     </div>`);
 }
 
-function crud_api_call(year="") {
-    if (year) {offcanvasScrollingLabel.innerHTML = `Saved Trades from ${year}`}
-    else {
-        offcanvasScrollingLabel.innerHTML = `Saved Trades`
-        valid_years.clear()
-    }
-    $.get(`/api?${new URLSearchParams({year: year})}`, function(data){
+function crud_api_call() {
+    const year = year_select.value || ""
+    const portfolio = portfolio_select.value || ""
+    non_paramatric_con = !(year || portfolio)
+    if (non_paramatric_con) {valid_years.clear()}
+    $.get(`/api?${new URLSearchParams({year: year, portfolio: portfolio})}`, function(data){
         $("#trades-container").empty();
         $("#trades-container").append('<div id="open"></div>');
         $("#trades-container").append('<div id="closed"></div>');
         if ($.isEmptyObject(data) === true) {
-            $("#trades-container").append('You have no trades saved. Select the dropdown menu next to submit to get started!');
+            $("#trades-container").append('<p class="text-muted">No trades available for current selection.</p>');
         } else {
             for (let [name, info] of Object.entries(data)) {
                 if (info[3] === 'closed') {color = 'muted'} else {color = 'primary'}
                 $(`#${info[3]}`).append(`
                 <table class="table table-hover table-striped">
-                <thead><tr><th colspan="2">${name}<small class="text-${color}"> ${info[3]}</small></th></tr></thead>
+                <thead><tr><th colspan="2">${name}${info[4] && ` @ ${info[4]}`}<small class="text-${color}"> ${info[3]}</small></th></tr></thead>
                 <tbody><tr>
                     <td style="width: 50%;">${info[0]}</td>
                     <td style="width: 50%;">${info[1]} ${info[2]}</td></tr>
                     <tr><td><a href="/delete/${name}" class="link-danger delete" data-name="${name}">Delete</a></td>
                     <td><a href="/trade/${name}" class="link-primary">Populate</a></td></tr>
-                    <tr><td colspan="2"><a href="/?${new URLSearchParams({name: name, year: '',})}" class="link-success tax_link" data-name="${name}">Generate Tax Information</a></td></tr>
+                    <tr><td colspan="2"><a href="/?${new URLSearchParams({name: name})}" class="link-success tax_link" data-name="${name}">Generate Tax Information</a></td></tr>
                 </tbody></table>`
                 );
-                if (!year) {
+                if (non_paramatric_con) {
                     valid_years.add(parseInt(info[0]))
                 }
             }
         }
         if ($("#open")[0].innerHTML && $("#closed")[0].innerHTML) {$("#open")[0].insertAdjacentHTML('afterend', '<br><hr><br>');}
         //valid_years.sort()
-        $("#filter-dropdown-menu").empty();
-        $("#filter-dropdown-menu").append(`<li><button class="dropdown-item" onclick="crud_api_call()">All</button></li>`)
-        $("#filter-dropdown-menu").append(`<li><hr class="dropdown-divider"></li>`)
-        $("#tax-dropdown-menu").empty();
-        valid_years.forEach(year => {
-            $("#filter-dropdown-menu").append(`<li><button class="dropdown-item" onclick="crud_api_call(year=${year})">${year}</button></li>`)
-            $("#tax-dropdown-menu").append(`<li><button class="dropdown-item" onclick="load_tax(undefined, year=${year})">${year}</button></li>`)
-        });
+        if (non_paramatric_con) {
+            $("#year_select").empty();
+            $("#year_select").append(`<option selected value="">All</option>`)
+            valid_years.forEach(year => {
+                $("#year_select").append(`<option value="${year}">${year}</option>`)
+            });
+        }
         jQuery(".delete").click(function(event){
             event.preventDefault()
             $.get(event.currentTarget.href, function(response){
@@ -78,30 +72,45 @@ function crud_api_call(year="") {
                 crud_api_call()
             });
         });
-        jQuery(".tax_link").click(function(event){
-            event.preventDefault()
-            load_tax(name=event.currentTarget.dataset.name)
-        });
+        jQuery(".tax_link").click(load_tax);
     });
 }
 
-function load_tax(name="", year="") {
-    if (name) {tax_table_title.innerHTML = `${name}`}
-    else if (year) {tax_table_title.innerHTML = `Trades from ${year}`}
-    else {tax_table_title.innerHTML = `All Trades`}
+function load_tax(event=null, url=null) {
+    if (event) {
+        event.preventDefault()
+        var name = event.currentTarget.dataset.name
+        var year = ""
+        var portfolio = ""
+        nameplate = name
+    } else if (url) {
+        var name = url.get("name") ?? ""
+        var year = url.get("year") ?? ""
+        var portfolio = url.get("portfolio") ?? ""
+    } else {
+        var name = ""
+        var year = year_select.value || ""
+        var portfolio = portfolio_select.value || ""
+    }
+    if (!event) {var nameplate = `${name || year || portfolio ? '' : 'All'} ${name ? name : "Trades"} ${year ? `from ${year}` : ""} ${portfolio ? `in ${portfolio}` : ""}`}
+    tax_table_title.innerHTML = nameplate
     body.style.display = "none";
     info.style.display = "none";
     tax_container.style.display = null;
     cached_url = window.location.pathname
-    window.history.replaceState('', '', `/?${new URLSearchParams({name: name, year: year,})}`);
-    $.get(`/tax?${new URLSearchParams({name: name, year: year})}`, function(response){
+    window.history.replaceState('', '', `/?${new URLSearchParams({name: name, year: year, portfolio: portfolio})}`);
+    $.get(`/tax?${new URLSearchParams({name: name, year: year, portfolio: portfolio})}`, function(response){
         tax_table_container.innerHTML = response[Object.keys(response)[0]];
-        tax_df.childNodes[3].childNodes.forEach(function(elem) {
-            if (elem.tagName === "TR") {
-                if (elem.childNodes[11].innerHTML.substring(1, 2) === "-") {elem.childNodes[11].style.color = "red"}
-                else {elem.childNodes[11].style.color = "green"}
-            }
-        })
+        if ($('#tax_df tbody').find('*').length === 0) {
+            tax_table_container.innerHTML = '<p class="text-center text-muted">No trades available for current selection.</p>'
+        } else {
+            tax_df.childNodes[3].childNodes.forEach(function(elem) {
+                if (elem.tagName === "TR") {
+                    if (elem.childNodes[11].innerHTML.substring(1, 2) === "-") {elem.childNodes[11].style.color = "red"}
+                    else {elem.childNodes[11].style.color = "green"}
+                }
+            })
+        }
     });
 }
 
@@ -113,12 +122,8 @@ function back_to_body(back=false) {
 }
 
 $(document).ready(function() {
-    var url = new URL(window.location.href);
-    if (url.searchParams.get("name") || url.searchParams.get("year")) {
-        if (url.searchParams.get("name")) {name=url.searchParams.get("name")} else {name=""}
-        if (url.searchParams.get("year")) {year=url.searchParams.get("year")} else {year=""}
-        load_tax(name, year)
-    }
+    var url = new URLSearchParams(window.location.search)
+    if (Array.from(url.keys()).some(item => ['name', 'year', 'portfolio'].includes(item))) {load_tax(null, url=url)}
     
     refresh()
     valid_years = new Set()
@@ -142,11 +147,19 @@ $(document).ready(function() {
             var bsOffcanvas = new bootstrap.Offcanvas(myOffcanvas)
             bsOffcanvas.show()
         }
-        var myCollapse = document.getElementById('crud_collapse')
-        var bsCollapse = new bootstrap.Collapse(myCollapse)
-        bsCollapse.show()
         crud_api_call()
+        for (const option of id_portfolio.options) {
+            if (!option.value) {
+                $("#portfolio_select").append(`<option selected value="${option.value}">All</option>`)
+            } else {
+                $("#portfolio_select").append(`<option value="${option.text}">${option.text}</option>`)
+            }
+        }
     }
+    var myCollapse = document.getElementById('crud_collapse')
+    var bsCollapse = new bootstrap.Collapse(myCollapse)
+    bsCollapse.show()
+
     $('#post-form').submit(function(event) {
         event.preventDefault()
         document.querySelectorAll(".FX_lookup").forEach(function (elem) {

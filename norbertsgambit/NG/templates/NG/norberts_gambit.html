@@ -4,7 +4,6 @@
 {% block title %}Norbert's Gambit Cost and Tax Calculator{% endblock %}
 
 {% block script %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="{% static 'NG/norberts_gambit.js' %}"></script>
     <script>var auth = "{{request.user.is_authenticated}}"</script>
     <style>
@@ -19,7 +18,7 @@
 
 {% block body %}
     <div class="row">
-        <div class="col-lg" style="margin-bottom: 5px;">
+        <div class="col-lg mb-1">
             <button class="btn btn-outline-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">
                 Saved Trades
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-square" viewBox="0 0 16 16">
@@ -27,10 +26,10 @@
                 </svg>
             </button>
         </div>
-        <div class="col-lg" style="margin-bottom: 5px;">
+        <div class="col-lg mb-1">
             <h1 class="text-center">Norbert's Gambit Calculator</h1>
         </div>
-        <div class="col-lg" style="margin-bottom: 5px;"></div>
+        <div class="col-lg mb-1"></div>
     </div>
 
     <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
@@ -42,20 +41,17 @@
             {% if not user.is_authenticated %}
                 Please <a href="{% url 'login' %}" class="link-primary">login</a> or <a href="{% url 'register' %}" class="link-primary">sign up</a> to save trades and view tax information.
             {% else %}
-                <div class="btn-group">
-                <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" style="margin-bottom: 5px;">Filter</button>
-                <ul class="dropdown-menu" id="filter-dropdown-menu">
-                </ul>
+                <div class="form-floating mb-2">
+                    <select id="year_select" class="form-select" aria-label="Default select example"></select>
+                    <label for="year_select">Year</label>
+                </div>
+                <div class="form-floating mb-2">
+                    <select id="portfolio_select" class="form-select" aria-label="Default select example"></select>
+                    <label for="portfolio_select">Portfolio</label>
                 </div>
 
-                <div class="btn-group" style="margin-bottom: 5px;">
-                <button type="button" class="btn btn-outline-success" onclick="load_tax()">Generate Tax Information All</button>
-                <button type="button" class="btn btn-outline-success dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
-                    <span class="visually-hidden">Toggle Dropdown</span>
-                </button>
-                <ul class="dropdown-menu" id="tax-dropdown-menu">
-                </ul>
-                </div>
+                <button type="button" class="btn btn-outline-primary" onclick="crud_api_call()">Filter</button>
+                <button type="button" class="btn btn-outline-success" onclick="load_tax()">Generate Tax Information</button>
 
                 <hr>
                 <div id="trades-container"></div>
@@ -133,7 +129,7 @@
 
     <div class="row justify-content-center" id="tax_container" style="display: none;">
         <div class="col-lg-4">
-            <button type="button" style="margin-top: 5px; margin-bottom: 10px;" class="btn btn-outline-success" id="back-to-body" onclick="back_to_body()">Back</button>
+            <button type="button" class="btn btn-outline-success mb-2" id="back-to-body" onclick="back_to_body()">Back</button>
             <h3 style="color: green;" class="text-center" id="tax_table_title"></h3>
             <div id="tax_table_container" class="table-responsive"></div>
         </div>
@@ -293,29 +289,40 @@
                         </div>
                     </div>
                 </div>
-                <div class="btn-group" style="margin-top: 5px; margin-bottom: 10px;">
+                <div class="btn-group mb-2">
                     <button data-crudop="/" type="submit" class="btn btn-outline-teal">Submit</button>
                     <button type="button" class="btn btn-outline-teal dropdown-toggle dropdown-toggle-split" data-bs-toggle="collapse" data-bs-target="#crud_collapse" aria-expanded="false" aria-controls="crud_collapse">
                         <span class="visually-hidden">Toggle Dropdown</span>
                     </button>
                 </div>
-                <button type="button" style="margin-top: 5px; margin-bottom: 10px;" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#feeModal">Fee Schedule</button>                  
-                <button type="button" style="margin-top: 5px; margin-bottom: 10px;" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#securitiesModal">Change Securities</button>
-                <div class="collapse" id="crud_collapse" style="margin-top: 5px; margin-bottom: 10px;">
+                <button type="button" class="btn btn-outline-primary mb-2" data-bs-toggle="modal" data-bs-target="#feeModal">Fee Schedule</button>                  
+                <button type="button" class="btn btn-outline-secondary mb-2" data-bs-toggle="modal" data-bs-target="#securitiesModal">Change Securities</button>
+                <div class="collapse mb-3 mt-1" id="crud_collapse">
                     <div class="card card-body">
-                        <div class="input-group mb-3">
+                        <div class="input-group mb-2">
                             {{ form.name }}
-                            {{ form.date }}
-                            <span class="input-group-text" id="basic-addon1">
-                                {{ form.closed.label_tag }}&nbsp;
-                                {{ form.closed }}
-                            </span>
                             <button data-crudop="{% if form.name.value %}/update/{{ form.name.value }}{% else %}/create{% endif %}" type="submit" class="btn btn-primary">
                                 {% if form.name.value %}Update {{ form.name.value }}{% else %}Save Trade{% endif %}
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-square" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M15 2a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2zM0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2zm4.5 5.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5z"/>
                                 </svg>
                             </button>
+                        </div>
+                        <div class="input-group">
+                            {% if form.portfolio.field.widget.attrs.disabled %}
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="popover" title="Optional - Select Portfolio" data-bs-trigger="focus"
+                                data-bs-content="Trades can be bound to different portfolios.
+                                To create your first portfolio, {% if user.is_authenticated %} head to the account settings for <a href='{% url 'user' user.username %}'>{{ user }}</a>{% else %} please <a href='{% url 'login' %}'>login</a> or <a href='{% url 'register' %}'>sign up</a>{% endif %}.">         
+                            {% else %}
+                                <span>
+                            {% endif %}
+                            {{ form.portfolio }}
+                                </span>
+                            {{ form.date }}
+                            <span class="input-group-text" id="basic-addon1">
+                                {{ form.closed.label_tag }}&nbsp;
+                                {{ form.closed }}
+                            </span>
                         </div>
                     </div>
                 </div>

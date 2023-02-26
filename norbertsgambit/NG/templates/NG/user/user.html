@@ -2,6 +2,16 @@
 
 {% block title %}{{ user.username }}{% endblock %}
 
+{% block script %}
+    <script>
+        $(document).ready(function() {
+            if ($('#portfolio-form .errorlist').length > 0) {
+                $('#Portfolios').modal('show');
+            }
+        });
+    </script>
+{% endblock %}
+
 {% block body %}
 
     {% for field in form %}
@@ -21,16 +31,27 @@
             <div class="card-body">
                 <h5 class="card-title">Account Settings</h5>
                 <p class="card-text">This is where you can change your account settings.</p>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">Update Account Info</button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Account">Update Account Info</button>
+            </div>
+        </div></p>
+    </div></div>
+
+    <div class="row justify-content-center"><div class="col-lg-4"><p>
+        <div class="card text-center">
+            <h5 class="card-header">Portfolios</h5>
+            <div class="card-body">
+                <h5 class="card-title">Portfolio Settings</h5>
+                <p class="card-text">This is where you can edit your portfolios.</p>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Portfolios">Portfolios</button>
             </div>
         </div></p>
     </div></div>
     
-    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal fade" id="Account" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="AccountLabel" aria-hidden="true">
         <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-            <h5 class="modal-title" id="staticBackdropLabel">Update Account Info</h5>
+            <h5 class="modal-title" id="AccountLabel">Update Account Info</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{% url 'user' user.username %}" method="post">
@@ -45,10 +66,31 @@
             <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             <input class="btn btn-primary" type="submit" value="Update">
-            </form>
             </div>
+            </form>
         </div>
         </div>
     </div>  
+
+    <div class="modal fade" id="Portfolios" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="PortfoliosLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="PortfoliosLabel">Portfolios</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="portfolio-form" action="{% url 'portfolio' user.username %}" method="POST">
+                        {% csrf_token %}
+                        {{ portfolioformset.as_p}}
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-teal">Save Changes</button>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
