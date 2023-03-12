@@ -4,8 +4,24 @@
 
 {% block body %}
 
-    <h2>You have been logged out.</h2>
+<div class="row justify-content-center">
+    <div class="col-lg-6">
 
-    <small class="text-muted"><a href="{% url 'login' %}">Log In Again</a></small>
+        <div class="card">
+            <h2 class="card-header text-center">Logout</h2>
+            <div class="card-body">
+                Thanks for stopping by!
+                <br>
+                You have been logged out.
+            </div>
+            <div class="card-footer text-muted">
+                <small><a href="{% url 'index' %}">Return to Homepage</a></small>
+                |
+                <small><a href="{% url 'login' %}">Log In Again</a></small>
+            </div>
+        </div>
+
+    </div>
+</div>
 
 {% endblock %}

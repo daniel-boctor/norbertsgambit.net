@@ -16,9 +16,9 @@
     </style>
 {% endblock %}
 
-{% block body %}
-    <div class="row">
-        <div class="col-lg mb-1">
+{% block body-fluid %}
+    <div class="row justify-content-start">
+        <div class="col-lg-4 mb-1">
             <button class="btn btn-outline-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling">
                 Saved Trades
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-right-square" viewBox="0 0 16 16">
@@ -26,12 +26,13 @@
                 </svg>
             </button>
         </div>
-        <div class="col-lg mb-1">
+        <div class="col-lg-4 mb-1">
             <h1 class="text-center">Norbert's Gambit Calculator</h1>
         </div>
-        <div class="col-lg mb-1"></div>
     </div>
+{% endblock %}
 
+{% block body %}
     <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
         <div class="offcanvas-header">
             <h5 class="offcanvas-title" id="offcanvasScrollingLabel">Saved Trades</h5>
@@ -60,7 +61,7 @@
     </div>
 
     <div class="row justify-content-center">
-        <div class="col-lg-4">
+        <div class="col-lg-6">
             <div class="accordion" id="accordionExample">
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingTwo">
@@ -128,7 +129,7 @@
     <br>
 
     <div class="row justify-content-center" id="tax_container" style="display: none;">
-        <div class="col-lg-4">
+        <div class="col-lg-6">
             <button type="button" class="btn btn-outline-success mb-2" id="back-to-body" onclick="back_to_body()">Back</button>
             <h3 style="color: green;" class="text-center" id="tax_table_title"></h3>
             <div id="tax_table_container" class="table-responsive"></div>
@@ -136,7 +137,7 @@
     </div>
 
     <div class="row justify-content-center" id="body">
-        <div class="col-lg-4" id="form-container">
+        <div class="col-lg-6" id="form-container">
             <form id="post-form">
                 <button onclick="refresh()" type="button" class="btn btn-link">Refresh Spreads
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow justify-content-center-clockwise" viewBox="0 0 16 16">
@@ -230,11 +231,11 @@
                                         </tr>
                                         <tr>
                                             <td>
-                                                <label for="lower_bound" class="form-label">Lower Bound on Commission (dollars / share)</label>
+                                                <label for="lower_bound" class="form-label">Lower Bound on Commission (dollars / trade)</label>
                                                 {{ form.lower_bound }}
                                             </td>
                                             <td>
-                                                <label for="upper_bound" class="form-label">Upper Bound on Commission (dollars / share)</label>
+                                                <label for="upper_bound" class="form-label">Upper Bound on Commission (dollars / trade)</label>
                                                 {{ form.upper_bound }}
                                             </td>
                                         </tr>
@@ -309,15 +310,17 @@
                             </button>
                         </div>
                         <div class="input-group">
-                            {% if form.portfolio.field.widget.attrs.disabled %}
+                            {% with is_disabled=form.portfolio.field.widget.attrs.disabled %}
+                            {% if is_disabled %}
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="popover" title="Optional - Select Portfolio" data-bs-trigger="focus"
                                 data-bs-content="Trades can be bound to different portfolios.
-                                To create your first portfolio, {% if user.is_authenticated %} head to the account settings for <a href='{% url 'user' user.username %}'>{{ user }}</a>{% else %} please <a href='{% url 'login' %}'>login</a> or <a href='{% url 'register' %}'>sign up</a>{% endif %}.">         
-                            {% else %}
-                                <span>
+                                To create your first portfolio, {% if user.is_authenticated %} head to the account settings for <a href='{% url 'user' user.username %}'>{{ user }}</a>{% else %} please <a href='{% url 'login' %}'>login</a> or <a href='{% url 'register' %}'>sign up</a>{% endif %}.">
                             {% endif %}
-                            {{ form.portfolio }}
+                                {{ form.portfolio }}
+                            {% if is_disabled %}
                                 </span>
+                            {% endif %}
+                            {% endwith %}
                             {{ form.date }}
                             <span class="input-group-text" id="basic-addon1">
                                 {{ form.closed.label_tag }}&nbsp;
@@ -333,7 +336,7 @@
     <div id="info" style="display: none;">
 
         <div class="row justify-content-center">
-            <div class="col-lg-4">
+            <div class="col-lg-6">
                 <div class="form-check form-switch">
                     <input class="form-check-input" type="checkbox" id="toggle_descriptions">
                     <label class="form-check-label" for="toggle_descriptions">Toggle Descriptions</label>
@@ -343,7 +346,7 @@
 
         <div class="row justify-content-center">
             <a class="text-teal" data-bs-toggle="collapse" href="#collapse0" role="button" aria-expanded="false" aria-controls="collapseExample"><h3 class="text-center">Transactions</h3></a>
-            <div class="col-lg-4">
+            <div class="col-lg-6">
                 <div class="collapse show" id="collapse0"><div class="card card-body">
                     <div class="table-responsive" id="id_0"></div>
                 </div></div>
@@ -352,12 +355,12 @@
         
         <div class="row justify-content-center">
             <a class="text-teal" data-bs-toggle="collapse" href="#collapse1" role="button" aria-expanded="false" aria-controls="collapseExample"><h3 class="text-center">Total Costs</h3></a>
-            <div class="col-lg-4">
+            <div class="col-lg-6">
                 <div class="collapse show" id="collapse1"><div class="card card-body">
                     <div class="table-responsive" id="id_1"></div>
                 </div></div>
             </div>
-            <div class="col-lg-4 description">
+            <div class="col-lg-6 description">
                 <div class="collapse show" id="collapse1"><div class="card card-body">
                     <ul>
                         <li><strong>Explicit Costs Incurred</strong> is the percentage of money converted that were lost to ECN fees and commissions.
@@ -377,12 +380,12 @@
 
         <div class="row justify-content-center">
             <a class="text-teal" data-bs-toggle="collapse" href="#collapse2" role="button" aria-expanded="false" aria-controls="collapseExample"><h3 class="text-center">Explicit Costs</h3></a>
-            <div class="col-lg-4">
+            <div class="col-lg-6">
                 <div class="collapse" id="collapse2"><div class="card card-body">
                     <div class="table-responsive" id="id_2"></div>
                 </div></div>
             </div>
-            <div class="col-lg-4 description">
+            <div class="col-lg-6 description">
                 <div class="collapse" id="collapse2"><div class="card card-body">
                     <ul>
                         <li>Explicit costs are defined as negative cash flows payed to a third party. In this case, explicit costs are comprised of ECN fees and commissions.</li>
@@ -396,7 +399,7 @@
 
         <div class="row justify-content-center">
             <a class="text-teal" data-bs-toggle="collapse" href="#collapse3" role="button" aria-expanded="false" aria-controls="collapseExample"><h3 class="text-center">ECN Fees</h3></a>
-            <div class="col-lg-4">
+            <div class="col-lg-6">
                 <div class="collapse" id="collapse3"><div class="card card-body">
                     <div class="table-responsive" id="id_3"></div>
                 </div></div>
@@ -405,7 +408,7 @@
 
         <div class="row justify-content-center">
             <a class="text-teal" data-bs-toggle="collapse" href="#collapse4" role="button" aria-expanded="false" aria-controls="collapseExample"><h3 class="text-center">Commissions</h3></a>
-            <div class="col-lg-4">
+            <div class="col-lg-6">
                 <div class="collapse" id="collapse4"><div class="card card-body">
                     <div class="table-responsive" id="id_4"></div>
                 </div></div>
@@ -414,7 +417,7 @@
 
         <div class="row justify-content-center">
             <a class="text-teal" data-bs-toggle="collapse" href="#collapse5" role="button" aria-expanded="false" aria-controls="collapseExample"><h3 class="text-center">Tax Information</h3></a>
-            <div class="col-lg-4">
+            <div class="col-lg-6">
                 <div class="collapse" id="collapse5"><div class="card card-body">
                     <div class="table-responsive" id="id_5"></div>
                 </div></div>

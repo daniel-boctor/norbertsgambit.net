@@ -24,30 +24,3 @@
     width: auto;
     margin: auto;
 }
-
-.graph {
-    max-width: 1200px;
-}
-
-.faq {
-    scroll-margin-top: 40px;
-}
-
-.image-res {
-    max-width: 100%;
-    margin-bottom: 10px;
-    margin-top: 10px;
-}
-
-.move {
-    width: 100%;
-}
-
-.board {
-	position: relative;
-	width: 100%;		/* desired width */
-}
-.board:before {
-	content: "";
-	padding-top: 100%; 	/* initial ratio of 1:1*/
-}
