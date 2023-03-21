@@ -5,7 +5,7 @@
 
 {% block script %}
     <script src="{% static 'NG/norberts_gambit.js' %}"></script>
-    <script>var auth = "{{request.user.is_authenticated}}"</script>
+    <script>var auth = "{{request.user.is_authenticated}}";</script>
     <style>
         .spread {
             margin-right: 5px;
@@ -132,26 +132,27 @@
         <div class="col-lg-6">
             <button type="button" class="btn btn-outline-success mb-2" id="back-to-body" onclick="back_to_body()">Back</button>
             <h3 style="color: green;" class="text-center" id="tax_table_title"></h3>
-            <div id="tax_table_container" class="table-responsive"></div>
+            <div id="tax_table_container" class="table-responsive" style="display: none;"></div>
+            <div id="tax_table_message"></div>
         </div>
     </div>
 
     <div class="row justify-content-center" id="body">
         <div class="col-lg-6" id="form-container">
             <form id="post-form">
-                <button onclick="refresh()" type="button" class="btn btn-link">Refresh Spreads
+                <a onclick="refresh()" role="button" class="btn btn-link mt-1">Refresh Spreads
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow justify-content-center-clockwise" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
                         <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
                     </svg>
-                </button>
+                </a>
                 <div class="table-responsive">
                     <table class="table">
                         <tr>
-                            <td id="td_cad"><div class="text-center"><button type="button" class="btn btn-outline-primary btn-sm spread"><small>Bid: </small><br><div id="TO-BID">&nbsp;</div></button><button type="button" class="btn btn-outline-primary btn-sm spread"><small>Ask: </small><br><div id="TO-ASK">&nbsp;</div></button></div>
-                            <div id="td_TO_label">DLR.TO</div> {{ form.DLR_TO }}</td>
-                            <td id="td_usd"><div class="text-center"><button type="button" class="btn btn-outline-primary btn-sm spread"><small>Bid: </small><br><div id="U-BID">&nbsp;</div></button><button type="button" class="btn btn-outline-primary btn-sm spread"><small>Ask: </small><br><div id="U-ASK">&nbsp;</div></button></div>
-                            <div id="td_U_label">DLR-U.TO</div> {{ form.DLR_U_TO }}</td>
+                            <td id="td_cad"><div class="text-center mb-1"><button type="button" class="btn btn-outline-primary btn-sm spread"><small>Bid: </small><br><div id="TO-BID">&nbsp;</div></button><button type="button" class="btn btn-outline-primary btn-sm spread"><small>Ask: </small><br><div id="TO-ASK">&nbsp;</div></button></div>
+                            <div id="td_TO_label">{{ form.DLR_TO.label }}</div> {{ form.DLR_TO }}</td>
+                            <td id="td_usd"><div class="text-center mb-1"><button type="button" class="btn btn-outline-primary btn-sm spread"><small>Bid: </small><br><div id="U-BID">&nbsp;</div></button><button type="button" class="btn btn-outline-primary btn-sm spread"><small>Ask: </small><br><div id="U-ASK">&nbsp;</div></button></div>
+                            <div id="td_U_label">{{ form.DLR_U_TO.label }}</div> {{ form.DLR_U_TO }}</td>
                         </tr>
                         <tr>
                             <td>
@@ -179,7 +180,7 @@
                         </tr>
                         <tr>
                             <td style="width: 50%;">
-                                <div id="to-convert">Cash to convert</div>
+                                <div id="to-convert">{{ form.initial.label }} to convert</div>
                                 <div class="input-group">
                                     <span class="input-group-text" id="initial-type">$</span>
                                     {{ form.initial }}
@@ -346,7 +347,7 @@
 
         <div class="row justify-content-center">
             <a class="text-teal" data-bs-toggle="collapse" href="#collapse0" role="button" aria-expanded="false" aria-controls="collapseExample"><h3 class="text-center">Transactions</h3></a>
-            <div class="col-lg-6">
+            <div class="col-lg-6 mb-1">
                 <div class="collapse show" id="collapse0"><div class="card card-body">
                     <div class="table-responsive" id="id_0"></div>
                 </div></div>
@@ -355,12 +356,12 @@
         
         <div class="row justify-content-center">
             <a class="text-teal" data-bs-toggle="collapse" href="#collapse1" role="button" aria-expanded="false" aria-controls="collapseExample"><h3 class="text-center">Total Costs</h3></a>
-            <div class="col-lg-6">
+            <div class="col-lg-6 mb-1">
                 <div class="collapse show" id="collapse1"><div class="card card-body">
                     <div class="table-responsive" id="id_1"></div>
                 </div></div>
             </div>
-            <div class="col-lg-6 description">
+            <div class="col-lg-6 description mb-1">
                 <div class="collapse show" id="collapse1"><div class="card card-body">
                     <ul>
                         <li><strong>Explicit Costs Incurred</strong> is the percentage of money converted that were lost to ECN fees and commissions.
@@ -380,12 +381,12 @@
 
         <div class="row justify-content-center">
             <a class="text-teal" data-bs-toggle="collapse" href="#collapse2" role="button" aria-expanded="false" aria-controls="collapseExample"><h3 class="text-center">Explicit Costs</h3></a>
-            <div class="col-lg-6">
+            <div class="col-lg-6 mb-1">
                 <div class="collapse" id="collapse2"><div class="card card-body">
                     <div class="table-responsive" id="id_2"></div>
                 </div></div>
             </div>
-            <div class="col-lg-6 description">
+            <div class="col-lg-6 description mb-1">
                 <div class="collapse" id="collapse2"><div class="card card-body">
                     <ul>
                         <li>Explicit costs are defined as negative cash flows payed to a third party. In this case, explicit costs are comprised of ECN fees and commissions.</li>
@@ -399,7 +400,7 @@
 
         <div class="row justify-content-center">
             <a class="text-teal" data-bs-toggle="collapse" href="#collapse3" role="button" aria-expanded="false" aria-controls="collapseExample"><h3 class="text-center">ECN Fees</h3></a>
-            <div class="col-lg-6">
+            <div class="col-lg-6 mb-1">
                 <div class="collapse" id="collapse3"><div class="card card-body">
                     <div class="table-responsive" id="id_3"></div>
                 </div></div>
@@ -408,7 +409,7 @@
 
         <div class="row justify-content-center">
             <a class="text-teal" data-bs-toggle="collapse" href="#collapse4" role="button" aria-expanded="false" aria-controls="collapseExample"><h3 class="text-center">Commissions</h3></a>
-            <div class="col-lg-6">
+            <div class="col-lg-6 mb-1">
                 <div class="collapse" id="collapse4"><div class="card card-body">
                     <div class="table-responsive" id="id_4"></div>
                 </div></div>
@@ -417,7 +418,7 @@
 
         <div class="row justify-content-center">
             <a class="text-teal" data-bs-toggle="collapse" href="#collapse5" role="button" aria-expanded="false" aria-controls="collapseExample"><h3 class="text-center">Tax Information</h3></a>
-            <div class="col-lg-6">
+            <div class="col-lg-6 mb-1">
                 <div class="collapse" id="collapse5"><div class="card card-body">
                     <div class="table-responsive" id="id_5"></div>
                 </div></div>

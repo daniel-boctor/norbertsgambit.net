@@ -12,6 +12,26 @@ document.addEventListener('DOMContentLoaded', function() {
     
 });
 
+theme_selector({update_selector: false})
+
 $(document).ready(function() {
     $('[data-bs-toggle="popover"]').popover({html:true});
+    $('.toast').toast('show');
+    theme_selector({update_theme: false})
 });
+
+function theme_selector({theme=localStorage.getItem('theme') ?? 'default', update_theme=true, update_selector=true}={}) {
+    if (update_theme) {
+        if (theme === 'default') {
+            document.getElementById("glass_css").disabled = true
+        } else if (theme === 'glass') {
+            document.getElementById("glass_css").disabled = false
+        }
+    }
+    if (update_selector) {
+        var selected = document.getElementById(theme)
+        $(selected).addClass('active');
+        $('.dropdown-item').not(selected).removeClass('active')
+        localStorage.setItem("theme", selected.id)
+    }
+}

@@ -1,29 +1,48 @@
 function fetch_spreads(suffix="TO", ticker="DLR") {
+    if ($(`#${suffix}-ASK, #${suffix}-BID`).has('.spinner-border').length) {return}
+    var prev_bid = $(`#${suffix}-BID`).html()
+    var prev_ask = $(`#${suffix}-BID`).html()
+    $(`#${suffix}-ASK, #${suffix}-BID`).parent().addClass('disabled')
+    $(`#${suffix}-ASK, #${suffix}-BID`).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span><span class="visually-hidden">Loading...</span>')
+    $('.refresh-alert').remove()
     fetch(`/scrape_spreads/${ticker}`)
     .then(response => {
         if (response.ok) return response.json()
-        message_system("danger", "Error:", `${ticker} could not be found.`)
         throw new Error('Network response was not ok.')
     })
     .then(data => {
+        $(`#${suffix}-ASK, #${suffix}-BID`).parent().removeClass('disabled')
         document.querySelector(`#${suffix}-BID`).innerHTML = data["BID"]
         document.querySelector(`#${suffix}-ASK`).innerHTML = data["ASK"]
         document.querySelector(`#td_${suffix}_label`).innerHTML = ticker
         document.querySelector(`#id_initial_fx option[value=${suffix}]`).innerHTML = ticker
+    })
+    .catch(error => {
+        $(`#${suffix}-BID`).html(prev_bid)
+        $(`#${suffix}-ASK`).html(prev_ask)
+        if (!isNaN(prev_bid)) {
+            $(`#${suffix}-ASK, #${suffix}-BID`).parent().removeClass('disabled')
+        }
+        message_system("danger", "Error", `${ticker} could not be found.`, form_alert=" refresh-alert")
     });
 }
 
 function refresh() {
-    fetch_spreads(suffix="TO", ticker=document.querySelector("#id_cad_ticker").value)
-    fetch_spreads(suffix="U", ticker=document.querySelector("#id_usd_ticker").value)
+    fetch_spreads(suffix="TO", ticker=document.querySelector("#id_cad_ticker").value.toUpperCase())
+    fetch_spreads(suffix="U", ticker=document.querySelector("#id_usd_ticker").value.toUpperCase())
 }
 
 function message_system(type, header, body, form_alert="") {
-    document.querySelector('#form-container').insertAdjacentHTML('afterbegin', 
-    `<div class="alert alert-${type}${form_alert} alert-dismissible sticky-top fade show" role="alert">
-        <strong>${header}:</strong> ${body}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>`);
+    $('.toast.hide').remove()
+    document.querySelector('.toast-container').insertAdjacentHTML('afterbegin',`
+    <div class="toast${form_alert}" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+        <div class="toast-header bg-${type} text-white">
+            <strong class="me-auto">${header}</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">${body}</div>
+    </div>`)
+    $('.toast').toast('show')
 }
 
 function crud_api_call() {
@@ -100,10 +119,14 @@ function load_tax(event=null, url=null) {
     cached_url = window.location.pathname
     window.history.replaceState('', '', `/?${new URLSearchParams({name: name, year: year, portfolio: portfolio})}`);
     $.get(`/tax?${new URLSearchParams({name: name, year: year, portfolio: portfolio})}`, function(response){
-        tax_table_container.innerHTML = response[Object.keys(response)[0]];
-        if ($('#tax_df tbody').find('*').length === 0) {
-            tax_table_container.innerHTML = '<p class="text-center text-muted">No trades available for current selection.</p>'
+        if ($(response[Object.keys(response)[0]]).find('tbody').children().length === 0) {
+            $(tax_table_container).hide()
+            $(tax_table_message).show()
+            tax_table_message.innerHTML = '<p class="text-center text-muted">No trades available for current selection.</p>'
         } else {
+            $(tax_table_container).show()
+            $(tax_table_message).hide()
+            tax_table_container.innerHTML = response[Object.keys(response)[0]]
             tax_df.childNodes[3].childNodes.forEach(function(elem) {
                 if (elem.tagName === "TR") {
                     if (elem.childNodes[11].innerHTML.substring(1, 2) === "-") {elem.childNodes[11].style.color = "red"}
@@ -178,6 +201,7 @@ $(document).ready(function() {
                 'X-CSRFToken': getCookie("csrftoken")
             },
             success: function(response) {
+                document.querySelectorAll(".form-alert").forEach(function (elem) {elem.remove()})
                 if (auth === 'True' && crudop) {crud_api_call()}
                 if (Object.keys(response)[0] === "MESSAGE" && response["MESSAGE"] instanceof Array) {
                     message_system(response["MESSAGE"][0], response["MESSAGE"][1], response["MESSAGE"][2])
@@ -189,7 +213,6 @@ $(document).ready(function() {
                         message_system('danger', Object.keys(response)[i], response[Object.keys(response)[i]], form_alert=" form-alert")
                     }
                 } else {
-                    document.querySelectorAll(".form-alert").forEach(function (elem) {elem.remove()})
                     document.querySelector("#info").style.display = "block";
                     for (i=0; i<Object.keys(response).length; i++) {
                         document.querySelector(`#id_${i}`).innerHTML = response[Object.keys(response)[i]]

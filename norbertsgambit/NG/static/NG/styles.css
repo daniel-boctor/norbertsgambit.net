@@ -2,16 +2,6 @@
     margin-bottom: 10px;
 }
 
-.alert {
-    margin-top: 20px;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
-    max-width: 1200px;
-    width: 95%;
-    z-index: 1000;
-}
-
 .errorlist {
     color: red;
 }

@@ -64,8 +64,14 @@ def norberts_gambit(request, crudop=None, name=None):
                 "output_tax": output_tax.to_html(classes=["table table-hover table-fit-center"], border=0,  justify="unset"),
             })
         else:
+            errors = {}
+            for error in form.non_field_errors():
+                errors["Error"] = error
+            for field in form:
+                for error in field.errors:
+                    errors[field.label] = error
             return JsonResponse({
-                "ERROR": form.errors
+                "ERROR": errors
             })
 
 def scrape_spreads(request, ticker):
