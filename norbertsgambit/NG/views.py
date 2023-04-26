@@ -78,10 +78,12 @@ def scrape_spreads(request, ticker):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'}
     r = requests.get(f"https://finance.yahoo.com/quote/{ticker}", headers=headers)
     if r.text.find("BID-value") == -1: return JsonResponse({'status': 'false','message': f'{ticker} not found'}, status=400)
-    return JsonResponse({
+    response = JsonResponse({
         "BID": r.text[r.text.find("BID-value")+11:].split()[0],
         "ASK": r.text[r.text.find("ASK-value")+11:].split()[0]
     })
+    if 'cache' in request.GET: response['Cache-Control'] = 'private, max-age=43200'
+    return response
 
 def filter(querydict, user, allowed_filters):
     params = {k: v for k, v in querydict if v and k in allowed_filters}

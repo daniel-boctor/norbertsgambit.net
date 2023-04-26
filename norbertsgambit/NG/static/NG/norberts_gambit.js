@@ -1,11 +1,11 @@
-function fetch_spreads(suffix="TO", ticker="DLR") {
+function fetch_spreads(suffix="TO", ticker="DLR", cache) {
     if ($(`#${suffix}-ASK, #${suffix}-BID`).has('.spinner-border').length) {return}
     var prev_bid = $(`#${suffix}-BID`).html()
     var prev_ask = $(`#${suffix}-BID`).html()
     $(`#${suffix}-ASK, #${suffix}-BID`).parent().addClass('disabled')
     $(`#${suffix}-ASK, #${suffix}-BID`).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span><span class="visually-hidden">Loading...</span>')
     $('.refresh-alert').remove()
-    fetch(`/scrape_spreads/${ticker}`)
+    fetch(`/scrape_spreads/${ticker}${cache ? '?cache' : ''}`)
     .then(response => {
         if (response.ok) return response.json()
         throw new Error('Network response was not ok.')
@@ -27,9 +27,9 @@ function fetch_spreads(suffix="TO", ticker="DLR") {
     });
 }
 
-function refresh() {
-    fetch_spreads(suffix="TO", ticker=document.querySelector("#id_cad_ticker").value.toUpperCase())
-    fetch_spreads(suffix="U", ticker=document.querySelector("#id_usd_ticker").value.toUpperCase())
+function refresh(cache=false) {
+    fetch_spreads(suffix="TO", ticker=document.querySelector("#id_cad_ticker").value.toUpperCase(), cache)
+    fetch_spreads(suffix="U", ticker=document.querySelector("#id_usd_ticker").value.toUpperCase(), cache)
 }
 
 function message_system(type, header, body, form_alert="") {
@@ -148,7 +148,7 @@ $(document).ready(function() {
     var url = new URLSearchParams(window.location.search)
     if (Array.from(url.keys()).some(item => ['name', 'year', 'portfolio'].includes(item))) {load_tax(null, url=url)}
     
-    refresh()
+    refresh(cache=true)
     valid_years = new Set()
     fetch(`https://www.bankofcanada.ca/valet/observations/FXUSDCAD?recent=1`)
     .then(response => {

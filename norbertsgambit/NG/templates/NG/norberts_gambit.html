@@ -80,16 +80,16 @@
                                     <b><u>Features</u></b>
                                     <li><strong>Bid / ask spreads:</strong> This tool accounts for the live bid / ask spread on both DLR.TO and DLR.U.TO. Most existing tools don't account for this, and only pull a single quoted price.
                                         Not only is it important to know the exact prices at which you will trade for the sake of accuracy, but also because it is likely that potential ECN fees will be codependent on whether you choose to transact at the bid or ask.</li>
-                                    <li><strong>FX rates:</strong> Most tools only pull the current fx rate, and use it to calculate trading costs throughout the entire pair of trades. I have implemented the ability to specify an fx rate on both the date of purchase and the date of sale.
+                                    <li><strong>FX rates:</strong> Most tools only pull the current FX rate, and use it to calculate trading costs throughout the entire pair of trades. I have implemented the ability to specify an FX rate on both the date of purchase and the date of sale.
                                         The benefits of this are twofold. First, inbetween the purchase and sale date, the investor may experience a meaningful amount of drift in currency prices. If this is not accounted for, the trading costs will not be accurate.
                                         Second, the integrity of the data of past trades will not be skewed based off the interest rate drift from the time the trades occured to the time the calculation is being ran.</li>
                                     <li><strong>Implicit costs:</strong> Most tools will only account for explicit trading costs, defined as the sum of the ECN fees and commissions. In addition to explicit costs, this tool also accounts for implicit trading costs.
-                                        These consist of both the bid / ask spreads that could be either payed or earned based on the investors liquidity preferences, and the profit / loss realized from fx rate drift while the trades are settling and the shares are journaling.</li>
+                                        These consist of both the bid / ask spreads that could be either payed or earned based on the investors liquidity preferences, and the profit / loss realized from FX rate drift while the trades are settling and the shares are journaling.</li>
                                 </ul>
                                 <b><u>NOTES</u></b>
                                 <li>The included FX lookup tool fetches data directly from the BoC. If this field is left blank, data from the most recent business day will be used. This is recommended if you are calculating costs for a future trade.
                                     Please refer to their <a href="https://www.bankofcanada.ca/rates/exchange/">website</a> or their <a href="https://www.bankofcanada.ca/valet/docs">API</a> for any further information.</li>
-                                <li>At any time when a currency conversion needs to be calculated, the fx rate effective on the day of transaction will be used.</li>
+                                <li>At any time when a currency conversion needs to be calculated, the FX rate effective on the day of transaction will be used.</li>
                             </ul>
                         </div>
                     </div>
@@ -364,6 +364,8 @@
             <div class="col-lg-6 description mb-1">
                 <div class="collapse show" id="collapse1"><div class="card card-body">
                     <ul>
+                        <li><strong>Effective FX Rate</strong> is the FX rate required to achieve identical net results.
+                            It is calculated as: ( amount converted + explicit costs ) / ( amount received - explicit costs ), expressed as a direct quote (price of one unit of foreign currency is expressed in terms of the domestic currency).</li>
                         <li><strong>Explicit Costs Incurred</strong> is the percentage of money converted that were lost to ECN fees and commissions.
                             It is calculated as: combined fees quoted in initial currency / amount of initial currency converted.</li>
                         <li><strong>Implicit Spread Earned / Payed</strong> is the percentage difference between what was payed on the buy side and what was received on the sell side.</li>
@@ -373,7 +375,7 @@
                             It is calculated as: ( amount received on the sell side - local sell fees (both quoted in terms of the initial currency on the sell date) - local buy fees ) / amount converted on buy side.</li>
                         <li><strong>TOTAL P&L</strong> is the net dollar gain / loss expressed in the initial currency.
                             It is calculated as: ( amount received on the sell side - local sell fees (both quoted in terms of the initial currency on the sell date) - local buy fees ) - amount converted on buy side.</li>
-                            <ul><li>If the optional brokers FX spread field is used, the BoC rate on the buy date will be used as the base fx rate, and the amount of currency converted will be the same amount as Norbert's Gambit. This figure is also quoted in terms of the initial currency.</li></ul>
+                            <ul><li>If the optional brokers FX spread field is used, the BoC rate on the buy date will be used as the base FX rate, and the amount of currency converted will be the same amount as Norbert's Gambit. This figure is also quoted in terms of the initial currency.</li></ul>
                     </ul>
                 </div></div>
             </div>
@@ -392,7 +394,7 @@
                         <li>Explicit costs are defined as negative cash flows payed to a third party. In this case, explicit costs are comprised of ECN fees and commissions.</li>
                         <li><strong>Local Cost</strong> represents the amount of money that was payed in each respective currency.</li>
                         <li><strong>Combined Cost</strong> represents the total amount of money payed throughout the entire procedure, quoted in both CAD and USD.
-                            When converting between currencies, the fx rate effective on the day of transaction will be used.</li>
+                            When converting between currencies, the FX rate effective on the day of transaction will be used.</li>
                     </ul>
                 </div></div>
             </div>

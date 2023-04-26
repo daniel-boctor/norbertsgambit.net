@@ -51,7 +51,7 @@ class NGForm(forms.ModelForm):
             'dealers_rate': DollarDisplayTextInput(attrs={'class':'form-control', 'placeholder':'1 USD = '}),
             'cad_ticker': forms.TextInput(attrs={'class':'form-control'}),
             'usd_ticker': forms.TextInput(attrs={'class':'form-control'}),
-            'closed': forms.CheckboxInput(attrs={'class':'form-check-input'})
+            'closed': forms.CheckboxInput(attrs={'class':'form-check-input mt-0'})
         }
 
     def clean(self):
